@@ -13,11 +13,9 @@ class CommentTableViewCell: UITableViewCell {
     var commentButton       = UIButton()
     var commentLabel        = UILabel()
     var segmentControl      = UISegmentedControl()
-    var segmentIndex        = Int()
     
-    var segmentControlTracking: ((UITableViewCell) -> Void)?
     var cellChange: ((String) -> Void)?
-    var segmentChange: ((Int) -> Void)?
+    var segmentControlChanged: ((Int, UITableViewCell) -> Void)?
     
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -44,18 +42,10 @@ class CommentTableViewCell: UITableViewCell {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
-    }
     
     @objc func segmentControlSelected() {
-        let selectedSegment = segmentControl.selectedSegmentIndex
-        segmentControlTracking?(self)
-        segmentChange?(selectedSegment)
-        setSegmentControlAppearance(segment: self.segmentControl, index: selectedSegment)
+        segmentControlChanged?(segmentControl.selectedSegmentIndex, self)
+        setSegmentControlAppearance(segment: self.segmentControl, index: segmentControl.selectedSegmentIndex)
         
     }
 }

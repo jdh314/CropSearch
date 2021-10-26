@@ -60,12 +60,10 @@ class FacilityRiskAssessmentTableViewController: UITableViewController {
             cell.titleLabel.text = facilityArea.title
             cell.segmentControl.selectedSegmentIndex = facilityArea.facilityCondition
             setSegmentControlAppearance(segment: cell.segmentControl, index: cell.segmentControl.selectedSegmentIndex)
+            
+            // 
             if facilityArea.facilityCondition > -1 {
                 selectedSegments.append(cell)
-            }
-            //
-            cell.segmentControlTracking = { [weak self] cell in
-                self?.segmentControlPressed(cell: cell)
             }
             
             // changes the cell type in the data and reloads the tableView
@@ -74,12 +72,14 @@ class FacilityRiskAssessmentTableViewController: UITableViewController {
                 if self?.selectedSegments.contains(cell) == true {
                     self?.selectedSegments.remove(at: (self?.selectedSegments.firstIndex(of: cell)!)!)
                 }
-                self?.tableView.reloadRows(at: [indexPath], with: .bottom)
+                self?.tableView.reloadRows(at: [indexPath], with: .none)
             }
             
             // sets the objects facility condition to the selected segment
-            cell.segmentChange = { [weak self] newSegment in
+            //
+            cell.segmentControlChanged = { [weak self] newSegment, cell in
                 self?.dataSource.facilityAreas[indexPath.row].facilityCondition = newSegment
+                self?.segmentControlPressed(cell: cell)
             }
             return cell
             
@@ -101,19 +101,20 @@ class FacilityRiskAssessmentTableViewController: UITableViewController {
                 self?.dataSource.facilityAreas[indexPath.row].comments =  "Jonathan Hogue on \(dateFormatter.string(from: today)): " + comment
                 cell.commentTextField.text = nil
             }
-            cell.segmentControlTracking = { [weak self] cell in
-                self?.segmentControlPressed(cell: cell)
-            }
+            
             cell.cellChange = { [weak self] cellType in
                 self?.dataSource.facilityAreas[indexPath.row].cellType = cellType
                 if self?.selectedSegments.contains(cell) == true {
                     self?.selectedSegments.remove(at: (self?.selectedSegments.firstIndex(of: cell)!)!)
                 }
-                self?.tableView.reloadRows(at: [indexPath], with: .bottom)
+                self?.tableView.reloadRows(at: [indexPath], with: .none)
             }
-            cell.segmentChange = { [weak self] newSegment in
+            
+            cell.segmentControlChanged = {[weak self] newSegment, cell in
                 self?.dataSource.facilityAreas[indexPath.row].facilityCondition = newSegment
+                self?.segmentControlPressed(cell: cell)
             }
+            
             return cell
             
         case CellType.comment:
@@ -127,15 +128,15 @@ class FacilityRiskAssessmentTableViewController: UITableViewController {
             }
             cell.commentLabel.text = facilityArea.comments
             
-            cell.segmentControlTracking = { [weak self] cell in
-                self?.segmentControlPressed(cell: cell)
-            }
             cell.cellChange = { [weak self] cellType in
                 self?.dataSource.facilityAreas[indexPath.row].cellType = cellType
-                self?.tableView.reloadRows(at: [indexPath], with: .bottom)
+                self?.tableView.reloadRows(at: [indexPath], with: .none)
             }
-            cell.segmentChange = { [weak self] newSegment in
+            
+            
+            cell.segmentControlChanged = { [weak self] newSegment, cell in
                 self?.dataSource.facilityAreas[indexPath.row].facilityCondition = newSegment
+                self?.segmentControlPressed(cell: cell)
             }
             return cell
             
@@ -178,10 +179,8 @@ class FacilityRiskAssessmentTableViewController: UITableViewController {
         case true:
             return
         case false:
-            if !selectedSegments.contains(cell) {
-                selectedSegments.append(cell)
-            }
-            if selectedSegments.count == dataSource.facilityAreas.count{
+            selectedSegments.append(cell)
+            if selectedSegments.count == dataSource.facilityAreas.count {
                 headerCell.contentView.backgroundColor = UIColor.systemGreen
             }
         }
